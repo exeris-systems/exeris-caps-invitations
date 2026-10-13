@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 @CapabilityModule
 @CapabilityLifecycle
-@Provides(service = InvitationService.class, version = "1.0.0")
+@Provides(service = InvitationService.class, version = "0.1.0")
 @Requires(service = TransactionalExecutor.class, optional = true)
 public final class InvitationsModule implements CapabilityLifecycleHooks {
 
