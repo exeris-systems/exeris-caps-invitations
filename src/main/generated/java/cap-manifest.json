@@ -1,0 +1,46 @@
+{
+  "schemaVersion" : 2,
+  "stamp" : {
+    "validated" : true,
+    "compositionVersion" : "0.0.0",
+    "contentBinding" : "sha256:de93a7435c5eec92a61b0ab78cd9b656462e8d2fca187da14263c6454991d8c2"
+  },
+  "modules" : [
+    {
+      "name" : "InvitationsModule",
+      "packageName" : "eu.exeris.caps.invitations",
+      "qualifiedName" : "eu.exeris.caps.invitations.InvitationsModule",
+      "module" : {
+        "provides" : [
+          {
+            "service" : "eu.exeris.caps.invitations.InvitationService",
+            "version" : "1.0.0"
+          }
+        ],
+        "requires" : [
+          {
+            "service" : "eu.exeris.kernel.spi.persistence.TransactionalExecutor",
+            "optional" : true
+          }
+        ],
+        "lifecycleOwner" : "eu.exeris.caps.invitations.InvitationsModule"
+      }
+    }
+  ],
+  "resolutions" : [
+    {
+      "module" : "eu.exeris.caps.invitations.InvitationsModule",
+      "service" : "eu.exeris.kernel.spi.persistence.TransactionalExecutor",
+      "versionRange" : null,
+      "optional" : true,
+      "satisfied" : false,
+      "providers" : [ ]
+    }
+  ],
+  "initOrder" : [
+    "eu.exeris.caps.invitations.InvitationsModule"
+  ],
+  "warnings" : [
+    "module eu.exeris.caps.invitations.InvitationsModule @Requires service eu.exeris.kernel.spi.persistence.TransactionalExecutor but no @CapabilityModule provides it (optional — skipped)"
+  ]
+}
