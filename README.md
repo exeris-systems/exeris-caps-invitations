@@ -1,6 +1,6 @@
 # exeris-caps-invitations
 
-Tenant invitations as an Exeris capability. It provides one service, `InvitationService`: create an invitation for an email address, a tenant and a role with a time-to-live, look up a still-valid invitation by its token, and accept it. The token is returned once and stored hashed; acceptance consumes it atomically.
+Tenant invitations as an Exeris capability. It provides one service, `InvitationService` (ADR-099): `issue` an invitation for an email address, a tenant and a role with a bounded time-to-live, `list` a tenant's invitations (paged), `revoke` a pending one, and `consume` one by its token. The token is 256 bits of randomness, returned once and stored as a SHA-256 hash. `consume` takes the tenant and the acceptor's verified address and checks token, tenant and address in a single conditional write, so a caller who holds the token but is not the invitee fails without using the invitation up. Issuing, listing and revoking are checked against an `InvitationAdministrators` the composition supplies.
 
 Status: proof of concept, built against `exeris-kernel` 0.13.0-SNAPSHOT. The API is not stable and no artefact has been published.
 
@@ -14,12 +14,13 @@ Status: proof of concept, built against `exeris-kernel` 0.13.0-SNAPSHOT. The API
 
 Behaviour worth knowing before composing it:
 
-- Storage is in memory unless a kernel `TransactionalExecutor` is supplied, in which case a PostgreSQL repository is used. No DDL file ships with this cap yet.
+- Storage is PostgreSQL through the kernel `TransactionalExecutor`. The composing SKU builds the wired instance with `new InvitationsModule(tx, administrators[, policy])` and applies `InvitationsModule.MIGRATIONS` first (`db/migration/exeris-caps-invitations/V1__invitations.sql`). The table is tenant-scoped with a row-level-security policy keyed on `exeris.tenant_id` (ADR-012), so the persistence session must carry the tenant. The no-arg instance only runs the lifecycle and hands out no service; there is no in-memory fallback.
+- The longest lifetime is `InvitationPolicy.maxTtl` (default 7 days); a non-positive or larger `ttl` is refused.
 - Sending the invitation, and creating the tenant membership on acceptance, are left to the caller.
 
 ## Build & test
 
-Requires JDK 25 and Maven 3.9+.
+Requires JDK 25 and Maven 3.9+. `PostgresInvitationRepositoryLiveIT` starts PostgreSQL with Testcontainers, so a Docker daemon is needed and its absence fails the build.
 
 ```bash
 mvn compile -Dexeris.codegen.skip=true   # pass 1 — the processor writes capability metadata
