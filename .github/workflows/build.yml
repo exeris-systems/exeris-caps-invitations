@@ -65,6 +65,12 @@ jobs:
             exit 1
           fi
 
+      # PostgresInvitationRepositoryLiveIT starts a PostgreSQL container (Testcontainers), and it is the only
+      # test that runs the SQL and the row-level-security policy, so a runner without a Docker daemon must
+      # fail the build, not skip it.
+      - name: Check that a Docker daemon is available
+        run: docker info --format '{{.ServerVersion}}'
+
       # japicmp.skip: the SDK binds a semver gate to verify whose baseline is the previous release
       # jar, which a runner cannot resolve. That gate belongs to the SDK's own CI.
       - name: Install exeris-sdk to the local repository
