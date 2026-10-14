@@ -12,6 +12,9 @@ import java.util.UUID;
 public interface InvitationAdministrators {
 
     /**
+     * Tells whether the subject may issue, list and revoke the invitations of the tenant. A
+     * {@code false} answer makes those operations throw {@code InvitationAccessDeniedException}.
+     *
      * @param tenantId tenant whose invitations are administered
      * @param subjectId authenticated subject acting
      * @return {@code true} when the subject may administer the tenant's invitations
