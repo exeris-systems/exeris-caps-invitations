@@ -35,6 +35,7 @@ public interface InvitationService {
      * @return the stored invitation with its plaintext token, shown once
      * @throws InvitationAccessDeniedException if the actor may not administer the tenant
      * @throws InvalidInvitationException      if an argument is out of range
+     * @throws NullPointerException            if an argument is null
      */
     IssuedInvitation issue(UUID tenantId, UUID actorId, String email, String role, Duration ttl);
 
@@ -45,7 +46,10 @@ public interface InvitationService {
      * @param actorId  authenticated subject listing
      * @param limit    page size, 1 to 100
      * @param offset   rows to skip, not negative
+     * @return the page of invitations, empty when there are none
      * @throws InvitationAccessDeniedException if the actor may not administer the tenant
+     * @throws InvalidInvitationException      if {@code limit} is outside 1 to 100 or {@code offset} is
+     *                                         negative
      */
     List<Invitation> list(UUID tenantId, UUID actorId, int limit, int offset);
 
@@ -53,7 +57,8 @@ public interface InvitationService {
      * Revokes a pending invitation of the tenant.
      *
      * @return {@code true} when a pending invitation was revoked; {@code false} when there is none
-     *         (unknown, other tenant, consumed, revoked)
+     *         (unknown, other tenant, consumed, revoked,
+     *         expired)
      * @throws InvitationAccessDeniedException if the actor may not administer the tenant
      */
     boolean revoke(UUID tenantId, UUID actorId, UUID invitationId);
@@ -61,7 +66,11 @@ public interface InvitationService {
     /**
      * Finds the pending invitation the token opens for this tenant and address, without consuming it.
      *
+     * @param rawToken      plaintext token; a null or blank token opens nothing
+     * @param tenantId      tenant the acceptor is joining
      * @param acceptorEmail the acceptor's verified address
+     * @return the pending invitation, or empty when none matches the token, tenant and address
+     * @throws NullPointerException if {@code tenantId} is null
      */
     Optional<Invitation> findPending(String rawToken, UUID tenantId, String acceptorEmail);
 

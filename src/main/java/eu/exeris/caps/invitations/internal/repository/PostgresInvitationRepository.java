@@ -17,8 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * PostgreSQL implementation over {@link TransactionalExecutor}. Every write goes through
  * {@code executeManaged}; {@code query} is read-only and serves only the reads. Consuming and revoking
- * are single conditional {@code UPDATE} statements, so concurrent attempts cannot both succeed. A placeholder
- * is used once: the driver binds positionally.
+ * are single conditional {@code UPDATE} statements, so concurrent attempts cannot both succeed.
  */
 public final class PostgresInvitationRepository implements InvitationRepository {
 
