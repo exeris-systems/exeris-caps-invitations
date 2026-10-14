@@ -50,23 +50,29 @@ public interface InvitationService {
      * @throws InvitationAccessDeniedException if the actor may not administer the tenant
      * @throws InvalidInvitationException      if {@code limit} is outside 1 to 100 or {@code offset} is
      *                                         negative
+     * @throws NullPointerException            if {@code tenantId} or {@code actorId} is null
      */
     List<Invitation> list(UUID tenantId, UUID actorId, int limit, int offset);
 
     /**
      * Revokes a pending invitation of the tenant.
      *
+     * @param tenantId     tenant the invitation belongs to
+     * @param actorId      authenticated subject revoking
+     * @param invitationId invitation to revoke
      * @return {@code true} when a pending invitation was revoked; {@code false} when there is none
-     *         (unknown, other tenant, consumed, revoked,
-     *         expired)
+     *         (unknown, other tenant, consumed, revoked, expired)
      * @throws InvitationAccessDeniedException if the actor may not administer the tenant
+     * @throws NullPointerException            if {@code tenantId}, {@code actorId} or
+     *                                         {@code invitationId} is null
      */
     boolean revoke(UUID tenantId, UUID actorId, UUID invitationId);
 
     /**
      * Finds the pending invitation the token opens for this tenant and address, without consuming it.
      *
-     * @param rawToken      plaintext token; a null or blank token opens nothing
+     * @param rawToken      plaintext token; a null, blank or over-long (more than 128 characters) token
+     *                      opens nothing
      * @param tenantId      tenant the acceptor is joining
      * @param acceptorEmail the acceptor's verified address
      * @return the pending invitation, or empty when none matches the token, tenant and address
@@ -83,6 +89,7 @@ public interface InvitationService {
      * @param acceptorEmail the acceptor's verified address
      * @return the consumed invitation
      * @throws InvalidInvitationException if no pending invitation matches all three
+     * @throws NullPointerException       if {@code tenantId} is null
      */
     Invitation consume(String rawToken, UUID tenantId, String acceptorEmail);
 }
