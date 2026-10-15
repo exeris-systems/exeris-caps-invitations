@@ -3,7 +3,7 @@
   "stamp" : {
     "validated" : true,
     "compositionVersion" : "0.0.0",
-    "contentBinding" : "sha256:2446be0e2feeac7f16669f8f8bd2381363f5ad921e0f4dd3dbd41b2ec1024b06"
+    "contentBinding" : "sha256:c3a54fee7a86446adb7a4c44f5848629825a30ea02c0be9c5c2f010204e98cca"
   },
   "modules" : [
     {
@@ -13,7 +13,7 @@
       "module" : {
         "provides" : [
           {
-            "service" : "eu.exeris.caps.invitations.InvitationService",
+            "service" : "eu.exeris.caps.invitations.api.InvitationService",
             "version" : "0.1.0"
           }
         ],

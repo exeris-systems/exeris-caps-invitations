@@ -4,7 +4,7 @@ type: reference
 visibility: public
 owning-repo: exeris-caps-invitations
 status: active
-last-verified: 2026-10-13
+last-verified: 2026-10-14
 ---
 
 # Review rules for `exeris-caps-invitations`
@@ -93,25 +93,32 @@ S7. **Verification names what ran.** CI runs `mvn verify` on JDK 25 and 26 on ev
     `target/surefire-reports` at `<sha>`, and the reviewer accepts that as the evidence of what ran
     locally. A Verification that claims a pass without a command, report path or sha → `[STYLE]`.
 
-S8. **The token is returned once and stored hashed.** `createInvitation` returns the plaintext token
-    in `CreatedInvitation` and persists only its hash; a raw token persisted, logged or returned by
-    `findValidInvitation` or `acceptInvitation` → `[HARD BLOCK]`.
+S8. **The token is returned once and stored hashed.** `issue` returns the plaintext token in
+    `IssuedInvitation` and persists only its SHA-256 hash, from at least 256 bits of `SecureRandom`; a
+    raw token persisted, logged, or returned by `findPending`, `list` or `consume`, or a token hash in
+    the public `Invitation` view → `[HARD BLOCK]`.
 
-S9. **Acceptance consumes the invitation atomically.** `acceptInvitation` throws
-    `InvalidInvitationException` for a missing, expired or already consumed token, and two
-    concurrent accepts cannot both succeed. A read-then-write acceptance, or a consumed invitation
-    that `findValidInvitation` still returns → `[HARD BLOCK]`.
+S9. **Consumption is one conditional write bound to tenant and address.** `consume` throws
+    `InvalidInvitationException` for a missing, expired, revoked or already consumed token, or one that
+    does not match the given tenant and acceptor address, and a mismatch does not consume the
+    invitation. Two concurrent consumes cannot both succeed. A read-then-write consumption, a check of
+    tenant or address after the token is consumed, or a consumed invitation that `findPending` still
+    returns → `[HARD BLOCK]`.
 
-S10. **Lookup returns only a still-valid invitation.** `findValidInvitation` answers empty for an
-    expired, consumed or unknown token, → `[CONTRACT]` otherwise.
+S10. **Lookup, list and revoke are tenant-scoped and authorised.** `findPending` answers empty for an
+    expired, consumed, revoked or unknown token or another tenant or address. `issue`, `list` and
+    `revoke` call `InvitationAdministrators` before touching storage, and `ttl` is positive and within
+    `InvitationPolicy.maxTtl` → `[CONTRACT]` otherwise.
 
 S11. **Sending the invitation and creating the membership stay with the caller.** The README leaves
     both out. A mail, notification or membership call added to this capability → `[CONTRACT]`; it
     would be an edge in the composition graph and a second owner of tenant membership.
 
-S12. **Storage honours the README.** In-memory unless a `TransactionalExecutor` is supplied, then
-    PostgreSQL, and no DDL file ships yet. A repository change that adds a stored column with no
-    migration file, or a DDL file added without the README sentence changing → `[DOC DEBT]`.
+S12. **Storage honours the README.** The repository's writes go through `executeManaged`, never
+    `query`, and a stored column has a migration in `InvitationsModule.MIGRATIONS` under a
+    tenant row-level-security policy (ADR-012). A repository change that adds a column with no
+    migration, a table without the policy, or a public constructor that names an `internal` type →
+    `[HARD BLOCK]`.
 
 ## Where this does not apply, and what it costs
 
