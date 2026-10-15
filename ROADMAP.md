@@ -18,17 +18,18 @@ Milestones are versions, not dates.
 
 ## Before 0.1.0
 
+No item.
+
+## Later
+
 ### Authorise the role being granted
 
-[Tracking issue #12](https://github.com/exeris-systems/exeris-caps-invitations/issues/12).
 `InvitationAdministrators.mayAdminister(tenantId, subjectId)` is the only check `issue` makes, so any
 subject who may administer a tenant's invitations can issue one carrying any role of 1 to 64
 characters, including a role above their own. The role is checked for length only, and the
-composition has no hook to refuse a grant. Adding the role to the SPI is breaking, which costs
-nothing before the first release. Code: `spi/InvitationAdministrators.java`,
+composition has no hook to refuse a grant. A role-level check needs a contract change, because the SPI offers only
+`mayAdminister(tenantId, subjectId)`; adding the role to it is breaking. Code: `spi/InvitationAdministrators.java`,
 `internal/DefaultInvitationService.java` (`issue`, `authorize`).
-
-## Later
 
 ### Take the transactional executor in `initialize()`
 
