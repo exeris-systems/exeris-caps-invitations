@@ -2,7 +2,7 @@
 
 Tenant invitations as an Exeris capability. It provides one service, `InvitationService` (ADR-099): `issue` an invitation for an email address, a tenant and a role with a bounded time-to-live, `list` a tenant's invitations (paged), `revoke` a pending one, and `consume` one by its token. The token is 256 bits of randomness, returned once and stored as a SHA-256 hash. `consume` takes the tenant and the acceptor's verified address and checks token, tenant and address in a single conditional write, so a caller who holds the token but is not the invitee fails without using the invitation up. Issuing, listing and revoking are checked against an `InvitationAdministrators` the composition supplies.
 
-Status: proof of concept, built against `exeris-kernel` 0.13.0-SNAPSHOT. The API is not stable and no artefact has been published.
+Status: proof of concept, built against `exeris-kernel` 0.13.0. The API is not stable and no artefact has been published.
 
 ## Where it sits
 
@@ -29,7 +29,7 @@ mvn verify                               # pass 2 — generate cap-manifest.json
 
 Both passes are needed after a `clean`: `exeris:generate` runs before `compile`, and `compile` is when the processor writes the metadata it reads. `src/main/generated/java/cap-manifest.json` is committed, so a clean `git status` after `mvn verify` shows the manifest matches the declaration.
 
-`exeris-sdk` 0.12.0 and `exeris-tooling` 0.10.0 resolve from Maven Central, and `exeris-kernel` 0.13.0-SNAPSHOT is resolved from GitHub Packages, which needs a token with `read:packages`. [`.github/workflows/build.yml`](.github/workflows/build.yml) is the exact sequence, and [`.github/maven-settings.xml`](.github/maven-settings.xml) the repository configuration it uses.
+`exeris-sdk` 0.12.0 and `exeris-tooling` 0.10.0 resolve from Maven Central, and `exeris-kernel` 0.13.0 is resolved from GitHub Packages, which needs a token with `read:packages`. [`.github/workflows/build.yml`](.github/workflows/build.yml) is the exact sequence, and [`.github/maven-settings.xml`](.github/maven-settings.xml) the repository configuration it uses.
 
 ## Documentation
 
