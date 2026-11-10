@@ -4,7 +4,7 @@ type: roadmap
 visibility: public
 owning-repo: exeris-caps-invitations
 status: active
-last-verified: 2026-10-15
+last-verified: 2026-11-10
 ---
 
 # Roadmap of `exeris-caps-invitations`
@@ -37,7 +37,7 @@ The module declares `@Requires(service = TransactionalExecutor.class, optional =
 composing SKU builds the wired instance by hand with `new InvitationsModule(tx, administrators[, policy])`.
 The manifest records the requirement as `satisfied: false` with no provider. The requirement stays
 optional because a `@Requires` on a kernel SPI type is reported as a capability-graph error
-(`exeris-tooling#409`, open). The kernel `development/0.13.0` branch publishes
+(`exeris-tooling#409`, open). Kernel 0.13.1 publishes
 `KernelProviders.TRANSACTIONAL_EXECUTOR`, so the module can read it in `initialize()` once the
 tooling accepts the requirement. Until then the cost is that the SKU owns the wiring and the no-arg
 instance hands out no service. Code: `InvitationsModule.java`, `cap-manifest.json`. Waits on:

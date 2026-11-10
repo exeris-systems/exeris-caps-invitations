@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  packages: read
 
 jobs:
   build:
@@ -20,13 +19,6 @@ jobs:
         # 25 is the baseline the jar is compiled for (`maven.compiler.release` 25); 26 checks that the
         # sources still compile on the next JDK. Both rows produce class-file major 69.
         java: ['25', '26']
-
-    env:
-      # exeris-kernel is resolved from GitHub Packages, which asks for a token even for a public
-      # package, and a repository's own GITHUB_TOKEN cannot read packages published by another
-      # repository. PACKAGES_READ_TOKEN is a classic PAT with read:packages, set as a repository or
-      # organisation secret. .github/maven-settings.xml is the only place it is used.
-      PACKAGES_READ_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
 
     steps:
       - name: Checkout exeris-caps-invitations
@@ -41,13 +33,6 @@ jobs:
           java-version: ${{ matrix.java }}
           cache: maven
 
-      - name: Check that the package-read token is set
-        run: |
-          if [ -z "${PACKAGES_READ_TOKEN}" ]; then
-            echo "::error::PACKAGES_READ_TOKEN is not set, so exeris-kernel cannot be resolved from GitHub Packages"
-            exit 1
-          fi
-
       # PostgresInvitationRepositoryLiveIT starts a PostgreSQL container (Testcontainers), and it is the only
       # test that runs the SQL and the row-level-security policy, so a runner without a Docker daemon must
       # fail the build, not skip it.
@@ -58,11 +43,11 @@ jobs:
       # processor writes the capability metadata it reads only during compile.
       - name: Seed capability metadata (first pass, codegen skipped)
         working-directory: exeris-caps-invitations
-        run: mvn -B -ntp -s .github/maven-settings.xml compile -Dexeris.codegen.skip=true
+        run: mvn -B -ntp compile -Dexeris.codegen.skip=true
 
       - name: mvn verify (second pass — generates, validates, scans the Wall)
         working-directory: exeris-caps-invitations
-        run: mvn -B -ntp -s .github/maven-settings.xml verify
+        run: mvn -B -ntp verify
 
       - name: Assert the cap manifest was emitted and stamped
         working-directory: exeris-caps-invitations
