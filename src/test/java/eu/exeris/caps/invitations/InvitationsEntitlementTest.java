@@ -1,5 +1,6 @@
 package eu.exeris.caps.invitations;
 
+import eu.exeris.kernel.spi.contract.EntitlementClass;
 import eu.exeris.kernel.spi.contract.EntitlementRequirement;
 import eu.exeris.kernel.tck.contract.AbstractEntitlementRequirementTck;
 import org.junit.jupiter.api.DisplayName;
@@ -34,5 +35,13 @@ class InvitationsEntitlementTest extends AbstractEntitlementRequirementTck {
     void requiresOnlyItsOwnCapability() {
         assertThat(new InvitationsEntitlement().requiredCapabilities()).containsExactly("exeris-caps-invitations");
         assertThat(InvitationsEntitlement.CAPABILITY_ID).isEqualTo("exeris-caps-invitations");
+    }
+
+    @Test
+    @DisplayName("entitlementClass() is COMMERCIAL and stable across calls")
+    void entitlementClassIsCommercialAndStable() {
+        InvitationsEntitlement entitlement = new InvitationsEntitlement();
+        assertThat(entitlement.entitlementClass()).isEqualTo(EntitlementClass.COMMERCIAL);
+        assertThat(entitlement.entitlementClass()).isSameAs(entitlement.entitlementClass());
     }
 }
